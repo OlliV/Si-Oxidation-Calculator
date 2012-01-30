@@ -5,76 +5,16 @@
 package oxidationcalculator;
 
 import java.util.Scanner;
-import oxidationSession.SiWafer;
-import oxidationModel.*;
 import oxidationSession.*;
+import oxidationModel.SiOxidationModel;
+import oxidationModel.genericOxidationModel;
 
 /**
  *
  * @author ollivanhoja
  */
 public class OxidationCalculator {  
-    static Session session = new Session();
-    
-    static class Session
-    {
-        oxidationSession oxs;
-        SiWafer wafer;
-        dryOxidationModel procDry;
-        wetOxidationModel procWet;
-        boolean no_data;
-        
-        public Session()
-        {
-            clear();
-        }
-        public void clear()
-        {
-            no_data = true;
-            procDry = null;
-            procWet = null;
-            oxs = new oxidationSession();
-        }
-                
-    }
-    
-    static void setWafer(SiWafer.eWaferOrientation orientation, double h)
-    {
-        session.clear();
-        session.wafer = new SiWafer(orientation, h);
-        session.procDry = new dryOxidationModel(session.wafer);
-        session.procWet = new wetOxidationModel(session.wafer);
-        //SiWafer wafer = new SiWafer(SiWafer.eWaferOrientation.mi100, 10);
-        //dryOxidationModel procDry = new dryOxidationModel(wafer);
-        //wetOxidationModel procWet = new wetOxidationModel(wafer);
-    }
-    
-    static void calculateSession()
-    {
-        //oxs.addPhase(1273.15, 1.0, procWet, false);
-        //oxs.addPhase(1273.15, (float)1.0, procDry, false);
-        //oxs.addPhase(1373.15, (float)5.0, procWet, false);
-        session.oxs.calculate();
-        System.out.println("Xo=" + session.oxs.get_Xo());
-        double t_tot = session.oxs.get_t_tot();
-        System.out.println("t_tot=" + t_tot + " h, " + t_tot*60 + " min");
-    }
-    
-    static void printPhases()
-    {
-        System.out.println("Si wafer selected: " + session.wafer.getOrientation() + ", " + session.wafer.get_h() + " um");
-        calculateSession();
-        System.out.println("---");
-        int i=0;
-        for (oxidationSession.oxidationPhase phase : session.oxs.phases)
-        {
-            System.out.println("#" + i + " : T=" + phase.T + " K, Xi=" 
-                    + phase.Xi + " um, Xo=" + phase.oModel.getWafer().getXo()
-                    + ", t=" + phase.t*60 + " min"
-                    + ", model=" + phase.oModel.toString());
-            i++;
-        }
-    }
+    static UISession session = new UISession();
 
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
@@ -105,79 +45,182 @@ public class OxidationCalculator {
                         System.out.println("Unknown wafer type!");
                     if (orientation != null)
                     {
-                        setWafer(orientation, Double.parseDouble(cmd[2]));
-                        System.out.println("Si wafer selected: " + session.wafer.getOrientation() + ", h=" + session.wafer.get_h() + " um");
+                        session.setWafer(orientation, Double.parseDouble(cmd[2]));
+                        System.out.println("Si wafer selected: " + session.getWafer().getOrientation() + ", h=" + session.getWafer().get_h() + " um");
                     }
                 }
             }
             else if (cmd[0].equals("addphase"))
             {
-                oxidationModel.SiOxidationModel model = null;
-                if (session.procDry != null && session.procWet != null)
+                addPhase(line);
+            }
+            else if (cmd[0].equals("addmodel"))
+            {
+                if (cmd.length == 7)
                 {
-                    if (!(cmd.length < 4))
-                    {
-                        if (cmd[4].equals("wet"))
-                            model = session.procWet;
-                        else if (cmd[4].equals("dry"))
-                            model = session.procDry;
-                        if (model != null)
-                        {
-                            if (cmd[1].equals("t"))
-                            {
-                                session.oxs.addPhase(Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), model, false);
-                                System.out.println("Added phase: T=" + cmd[2]
-                                        + " K, t=" + cmd[3] + " hr"
-                                        + ", model=" + model.toString());
-                                session.no_data = false;
-                            }
-                            else if (cmd[1].equals("Xo"))
-                            {
-                                session.oxs.addPhase(Double.parseDouble(cmd[2]), Double.parseDouble(cmd[3]), model, true);
-                                System.out.println("Added phase: T=" + cmd[2]
-                                        + " K, Xo=" + cmd[3] + " um"
-                                        + ", model=" + model.toString());
-                                session.no_data = false;
-                            }
-                            else
-                                System.out.println("Unknown command!");
-                        }
-                        else
-                            System.out.println("Unknown oxidation model!");
-                    }
-                    else
-                        System.out.println("Unknown command!");
+                    genericOxidationModel model;
+                    double D0BA, D0B, EaBA, EaB, Xi;
+                    D0BA = Integer.parseInt(cmd[1]);
+                    D0B  = Integer.parseInt(cmd[2]);
+                    EaBA = Integer.parseInt(cmd[3]);
+                    EaB  = Integer.parseInt(cmd[4]);
+                    Xi   = Integer.parseInt(cmd[5]);
+                    model = new genericOxidationModel(EaBA, EaB, D0BA, D0B, session.getWafer(), Xi);
+                    session.oxidationModels.add(model, cmd[6]);
+                    System.out.println("Added oxidation model: "
+                    + model.getD0BA() + ", " + model.getD0B() + ", "
+                    + model.getEaBA() + "eV, " + model.getEaB() + "eV, "
+                    + model.getDefault_Xi() + "um, "
+                    + cmd[6]);
                 }
                 else
-                    System.out.println("Wafer not set!");
+                    System.out.println("Error in command!");
             }
             else if (cmd[0].equals("clear"))
                 session.clear();
+            else if (cmd[0].equals("delphase"))
+            {
+                del(Integer.parseInt(cmd[1]));
+            }
             else if (cmd[0].equals("printphases"))
             {
-                if(!session.no_data)
+                if(!session.getNoData())
                     printPhases();
                 else
                     System.out.println("There is no oxidation session!");
             }
+            else if(cmd[0].equals("printmodels"))
+            {
+                printOxidationModels();
+            }
             else if (cmd[0].equals("help"))
             {
                 System.out.println("setwafer <100>/<111> h\n"
-                        + "addphase t/Xo [T in Kelvins] [time in hr / Xo in um] wet/dry\n"
+                        + "addphase t/Xo [time in hr / Xo in um] [T in Kelvins] wet/dry\n"
+                        + "addmodel D0BA D0B EaBA EaB Xi name"
+                        + "delphase i\n"
                         + "clear\n"
                         + "calculate\n"
                         + "printphases\n"
+                        + "printmodels\n"
                         + "quit");
             }
             else if (cmd[0].equals("calculate"))
             {
-                if (!session.no_data)
+                if (!session.getNoData())
                     calculateSession();
                 else
                     System.out.println("No data to calculate!");
             }
             else
                 System.out.println("No such command!");
+        }
+    }
+    
+    /**
+     * Calculate outcome fro whole process
+     */
+    static void calculateSession()
+    {
+        session.oxs.calculate();
+        System.out.println("Xo=" + session.oxs.get_Xo() + ", h_wafer=" + session.oxs.get_hW());
+        double t_tot = session.oxs.get_t_tot();
+        System.out.println("t_tot=" + t_tot + " h, " + t_tot*60 + " min");
+    }
+    
+    static void addPhase(String line)
+    {
+        String cmd[] = line.split(" ");
+        
+        if (session.getWafer() != null)
+        {
+            if (!(cmd.length < 4))
+            {
+                int model = Integer.parseInt(cmd[4]);
+                if (model <= session.oxidationModels.size())
+                {
+                    if (cmd[1].equals("t"))
+                    {
+                        session.addConsttPhase(Double.parseDouble(cmd[3]), Double.parseDouble(cmd[2]), model);
+                        System.out.println("Added phase: T=" + cmd[3]
+                                + " K, t=" + cmd[2] + " hr"
+                                + ", model=" + session.oxidationModels.get(model).toString());
+                    }
+                    else if (cmd[1].equals("Xo"))
+                    {
+                        session.addConstXoPhase(Double.parseDouble(cmd[3]), Double.parseDouble(cmd[2]), model);
+                        System.out.println("Added phase: T=" + cmd[3]
+                                + " K, Xo=" + cmd[2] + " um"
+                                + ", model=" + session.oxidationModels.get(model).toString());
+                    }
+                    else
+                        System.out.println("Unknown constant value: " + cmd[1]);
+                }
+                else
+                    System.out.println("Unknown oxidation model: " + model);
+            }
+            else
+                System.out.println("Unknown command!");
+        }
+        else
+            System.out.println("Wafer not set!");
+    }
+    
+    static void del(int i)
+    {
+        if (session.oxs != null)
+        {
+            try
+            {
+                session.oxs.removePhase(i);
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                System.out.println("Index out of bounds!");
+            }
+            finally
+            {
+                System.out.println("Phase #" + i + " removed succesfully.");
+            }
+        }
+    }
+    
+    /**
+     * Print all oxidation phases
+     */
+    static void printPhases()
+    {
+        System.out.println("Si wafer selected: " + session.getWafer().getOrientation() + ", " + session.getWafer().get_h() + " um");
+        calculateSession();
+        System.out.println("---");
+   
+        System.out.println("#\tT\tXi\tXo\tt\tmodel\n"
+                + "\tK\tum\tum\tmin");
+        for (int i=0; i < session.oxs.getSize(); i++)
+        {
+            oxidationSession.oxidationPhase phase = session.oxs.getPhase(i);
+            System.out.println(i + "\t" + phase.T + "\t" 
+                    + phase.getXi() + "\t" + phase.XoPhase
+                    + "\t" + phase.t*60 + "\t"
+                    + "\t" + phase.oModel.toString());
+        }
+    }
+    
+    /**
+     * Print oxidation models
+     */
+    static void printOxidationModels()
+    {
+        System.out.println("#\tD_0(BA)\tD_0(B)\tE_a(BA)\tE_a(B)\tX_i(def)\tname");
+        System.out.println("\t\t\teV\teV\tum");
+        for (int i=0; i < session.oxidationModels.size(); i++)
+        {
+            SiOxidationModel model = session.oxidationModels.get(i);
+            String name = session.oxidationModels.getName(i);
+            System.out.println(i + "\t" + model.getD0BA() + "\t" + model.getD0B() + "\t"
+                    + model.getEaBA() + "\t" + model.getEaB() + "\t"
+                    + model.getDefault_Xi() + "\t"
+                    + name);
         }
     }
 }

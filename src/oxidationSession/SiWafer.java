@@ -55,7 +55,7 @@ public class SiWafer {
      */
     public double get_h()
     {
-        return h;
+        return h + (0.54 * Xo);
     }
     /**
      * Set h of wafer
@@ -80,6 +80,6 @@ public class SiWafer {
     {
         this.orientation = orientation;
         this.h = h;
-        Xo = 1.0;
+        Xo = 0.0;
     }
 }

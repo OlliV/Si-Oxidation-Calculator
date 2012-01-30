@@ -9,8 +9,8 @@ import oxidationModel.*;
  */
 public class oxidationSession
 {
-    public ArrayList<oxidationSession.oxidationPhase> phases;
-    public int i;
+    private ArrayList<oxidationSession.oxidationPhase> phases;
+    private int i;
     private double t_tot;
     
     public double get_t_tot()
@@ -19,9 +19,23 @@ public class oxidationSession
     }
     public double get_Xo()
     {
-        int k;
-        k = (i > 0) ? i - 1 : i;
-        return phases.get(k).oModel.getWafer().getXo();
+        return phases.get(i).oModel.getWafer().getXo();
+    }
+    /**
+     * Get h of wafer after oxidation
+     * @return 
+     */
+    public double get_hW()
+    {
+        return phases.get(i).oModel.getWafer().get_h();
+    }
+    public int getI()
+    {
+        return i;
+    }
+    public void setI(int i)
+    {
+        this.i = i;
     }
 
     public class oxidationPhase
@@ -34,16 +48,36 @@ public class oxidationSession
         * Time t
         */
         public double t;
+        
         /**
         * Initial thickness of oxide on wafer
         */
-        public double Xi;
+        public double getXi()
+        {
+            return this.Xi;
+        }
+        /**
+        * Initial thickness of oxide on wafer
+        */
+        public void setXi(double Xi)
+        {
+            this.Xi = Xi;
+        }
+        
+        
+        public double XoSet;
+        
+        public double XoPhase;
 
         /**
          * Oxidation process model
          */
         public SiOxidationModel oModel;
         
+                /**
+        * Initial thickness of oxide on wafer
+        */
+        private double Xi;
         private boolean calc_t;
 
         /**
@@ -63,12 +97,12 @@ public class oxidationSession
             if (calc_t)
             {
                 this.t = 0.0;
-                this.oModel.getWafer().setXo(var);
+                XoSet = var;
             }
             else
             {
                 this.t = var;
-                this.oModel.getWafer().setXo(0.0);
+                XoSet = 0.0;
             }
         }
 
@@ -79,15 +113,18 @@ public class oxidationSession
         {
             if (calc_t)
             {
+                oModel.getWafer().setXo(oModel.getWafer().getXo() + XoSet);
                 if (oModel.getWafer().getXo() < Xi)
                     throw new IllegalArgumentException("Xo can't be zero or < Xi.");
                 t = Math.pow(oModel.getWafer().getXo(), 2) / oModel.B.getD(T) + oModel.getWafer().getXo() / oModel.BA.getD(T) - tau();
+                XoPhase = XoSet;
             }
             else
             {
                 if (t <= 0)
                     throw new IllegalArgumentException("t can't be zero or negative.");
-                oModel.getWafer().setXo(0.5 * ((1/oModel.BA.getD(T))*oModel.B.getD(T)) * (Math.sqrt(1 + 4*oModel.B.getD(T) / Math.pow(((1/oModel.BA.getD(T))*oModel.B.getD(T)), 2) * (t + tau())) - 1));
+                XoPhase = 0.5 * ((1/oModel.BA.getD(T))*oModel.B.getD(T)) * (Math.sqrt(1 + 4*oModel.B.getD(T) / Math.pow(((1/oModel.BA.getD(T))*oModel.B.getD(T)), 2) * (t + tau())) - 1);
+                oModel.getWafer().setXo(XoPhase);
             }
         }
 
@@ -120,13 +157,54 @@ public class oxidationSession
      */
     public void addPhase(double T, double var, SiOxidationModel oModel, boolean calc_t)
     {
-        if ((phases.size() - 1) < 0)
-            phases.add(new oxidationSession.oxidationPhase(T, var, oModel.getDefault_Xi(), oModel, calc_t));
-        else
-        {
-            double Xi = phases.get(phases.size() - 1).oModel.getWafer().getXo();
-            phases.add(new oxidationSession.oxidationPhase(T, var, Xi, oModel, calc_t));
-        }
+        phases.add(new oxidationSession.oxidationPhase(T, var, oModel.getDefault_Xi(), oModel, calc_t));
+    }
+    
+    /**
+     * Remove phase
+     * @param ind Index of phase to be removed
+     */
+    public void removePhase(int ind)
+    {
+        phases.remove(ind);
+        
+        // Update initial oxidation thickness parameter
+        if (phases.size() >= 1)
+            phases.get(0).Xi = phases.get(0).oModel.getDefault_Xi();
+    }
+    
+    /**
+     * Remove last phase
+     */
+    public void removePhase()
+    {
+        phases.remove(phases.size() - 1);
+    }
+    
+    /**
+     * Trim array of phases
+     */
+    public void trim()
+    {
+        phases.trimToSize();
+    }
+    
+    /**
+     * 
+     */
+    public int getSize()
+    {
+        return phases.size();
+    }
+    
+    public oxidationPhase getPhase(int ind)
+    {
+        return phases.get(ind);
+    }
+    
+    public oxidationPhase getPhase()
+    {
+        return phases.get(i);
     }
     
     /**
@@ -145,13 +223,20 @@ public class oxidationSession
      * Calculate all phases
      */
     public void calculate()
-    {
-        i = phases.size();
+    {           
         t_tot = 0;
-        for (oxidationSession.oxidationPhase phase : phases)
+        phases.get(0).oModel.getWafer().setXo(0.0);
+        if (phases.size() >= 1)
+            phases.get(0).setXi(phases.get(0).oModel.getDefault_Xi());
+                
+        for (i=0; i < phases.size(); i++)
         {
-                phase.calculate();
-                t_tot += phase.t;
+            oxidationPhase phase = phases.get(i);
+            if (i > 0)
+                phase.Xi = phases.get(i - 1).oModel.getWafer().getXo();
+            phase.calculate();
+            t_tot += phase.t;
         }
+        i--;
     }
 }

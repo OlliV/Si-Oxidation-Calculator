@@ -38,5 +38,5 @@ public class wetOxidationModel extends SiOxidationModel
         _Xi = 0.0;
         BA = new SiOxidationModel.ArrheniusRl(D0BA, EaBA);
         B = new SiOxidationModel.ArrheniusRl(D0B, EaB);
-    } 
+    }
 }
