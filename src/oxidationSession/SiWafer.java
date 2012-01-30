@@ -1,0 +1,85 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package oxidationSession;
+
+/**
+ * Silicon wafer material
+ * @author ollivanhoja
+ */
+public class SiWafer {
+
+    /**
+     * Crystal orientation of the wafer
+     * @return the crystal orientation
+     */
+    public eWaferOrientation getOrientation() {
+        return orientation;
+    }
+
+    /**
+     * @param orientation the crystal orientation to set
+     */
+    public void setOrientation(eWaferOrientation orientation) {
+        this.orientation = orientation;
+    }
+    
+    /**
+     * Possible crystal orientations for silicon wafer
+     */
+    public enum eWaferOrientation
+    {
+        mi100,
+        mi111
+    }
+    
+    /**
+     * X_o = oxidation layer thickness on wafer
+     */
+    public double getXo()
+    {
+        return Xo;
+    }
+    /**
+     * X_o = oxidation layer thickness on wafer
+     */
+    public void setXo(double Xo)
+    {
+        this.Xo = Xo;
+    }
+    
+     /**
+     * Get h of wafer
+     * @return 
+     */
+    public double get_h()
+    {
+        return h;
+    }
+    /**
+     * Set h of wafer
+     * @param h 
+     */
+    public void set_h(double h)
+    {
+        this.h = h;
+    }
+    
+    private eWaferOrientation orientation;
+    private double h;
+    private double Xo;
+   
+    
+    /**
+     * Silicon wafer
+     * @param orientation
+     * @param h 
+     */
+    public SiWafer(eWaferOrientation orientation, double h)
+    {
+        this.orientation = orientation;
+        this.h = h;
+        Xo = 1.0;
+    }
+}
