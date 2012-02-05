@@ -31,7 +31,24 @@ public class SiWafer {
     public enum eWaferOrientation
     {
         mi100,
-        mi111
+        mi111;
+        
+        @Override
+        public String toString(){
+            String[] splitNames = name().toLowerCase().split("_");
+            StringBuffer fixedName = new StringBuffer();
+
+            for(int i = 0; i < splitNames.length; i++)
+            {
+                String firstLetter = splitNames[i].substring(0, 1).toUpperCase(),
+                restOfWord = splitNames[i].substring(1),
+                spacer = (i == splitNames.length) ? "" : " ";
+
+                fixedName.append(firstLetter).append(restOfWord).append(spacer);
+            }
+
+            return fixedName.toString();
+        }
     }
     
     /**

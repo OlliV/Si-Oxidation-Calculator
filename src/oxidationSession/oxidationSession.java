@@ -63,11 +63,26 @@ public class oxidationSession
         {
             this.Xi = Xi;
         }
+        public double getXoSet()
+        {
+            return XoSet;            
+        }
+        public void setXoSet(double Xo)
+        {
+            this.XoSet = Xo;
+        }
+        public double getXoPhase()
+        {
+            return XoPhase;
+        }
+        public boolean getCalc_t()
+        {
+            return calc_t;
+        }
         
+        private double XoSet;
         
-        public double XoSet;
-        
-        public double XoPhase;
+        private double XoPhase;
 
         /**
          * Oxidation process model

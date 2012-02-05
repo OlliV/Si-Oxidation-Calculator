@@ -14,9 +14,16 @@ import oxidationModel.genericOxidationModel;
  * @author ollivanhoja
  */
 public class OxidationCalculator {  
-    static UISession session = new UISession();
+    protected static UISession session = new UISession();
 
     public static void main(String[] args) {
+       java.awt.EventQueue.invokeLater(new Runnable() {
+           @Override
+            public void run() {
+                new oxidationcalculatorUI().setVisible(true);
+            }
+        });
+        
         Scanner input = new Scanner(System.in);
         
         while(true)
@@ -200,7 +207,7 @@ public class OxidationCalculator {
         {
             oxidationSession.oxidationPhase phase = session.oxs.getPhase(i);
             System.out.println(i + "\t" + phase.T + "\t" 
-                    + phase.getXi() + "\t" + phase.XoPhase
+                    + phase.getXi() + "\t" + phase.getXoPhase()
                     + "\t" + phase.t*60 + "\t"
                     + "\t" + phase.oModel.toString());
         }

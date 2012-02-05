@@ -24,5 +24,6 @@ public class genericOxidationModel extends SiOxidationModel
         this._Xi = Xi;
         BA = new SiOxidationModel.ArrheniusRl(D0BA, EaBA);
         B = new SiOxidationModel.ArrheniusRl(D0B, EaB);
+        name = "";
     }
 }

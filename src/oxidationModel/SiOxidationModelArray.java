@@ -14,7 +14,6 @@ public class SiOxidationModelArray {
     public SiOxidationModelArray()
     {
         oxidationModels = new ArrayList<SiOxidationModel>();
-        names = new ArrayList<String>();
     }
     
     public SiOxidationModel get(int i)
@@ -24,24 +23,22 @@ public class SiOxidationModelArray {
     
     public String getName(int i)
     {
-        return this.names.get(i);
+        return this.oxidationModels.get(i).getName();
     }
     
     public void add(SiOxidationModel model)
     {
         oxidationModels.add(model);
-        names.add(null);
     }
     
     public void add(SiOxidationModel model, String name)
     {
         oxidationModels.add(model);
-        names.add(name);
     }
     
     public void setName(int i, String name)
     {
-        names.set(i, name);
+        this.oxidationModels.get(i).setName(name);
     }
     
     public void setModel(int i, SiOxidationModel model)
@@ -52,26 +49,23 @@ public class SiOxidationModelArray {
     public void set(int i, SiOxidationModel model, String name)
     {
         oxidationModels.set(i, model);
-        names.set(i, name);
+        this.oxidationModels.get(i).setName(name);
     }
     
     public void remove(SiOxidationModel model)
     {
         int i = oxidationModels.indexOf(model);
         oxidationModels.remove(model);
-        names.remove(i);
     }
     
     public void remove(int i)
     {
         oxidationModels.remove(i);
-        names.remove(i);
     }
     
     public void clear()
     {
         oxidationModels.clear();
-        names.clear();
     }
     
     public int size()
@@ -82,9 +76,7 @@ public class SiOxidationModelArray {
     public void trim()
     {
         oxidationModels.trimToSize();
-        names.trimToSize();
     }
     
     private ArrayList<SiOxidationModel> oxidationModels;
-    private ArrayList<String> names;
 }

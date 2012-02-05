@@ -23,12 +23,14 @@ public class wetOxidationModel extends SiOxidationModel
         switch(wafer.getOrientation())
         {
             case mi100:
+                name = "Wet oxidation <100>";
                 EaBA = 2.05;
                 EaB = 0.78;
                 D0BA = 97000000;
                 D0B = 386.0;
                 break;
             case mi111:
+                name = "Wet oxidation <100>";
                 EaBA = 2.05;
                 EaB = 0.78;
                 D0BA = 163000000.0;

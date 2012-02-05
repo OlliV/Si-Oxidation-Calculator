@@ -72,6 +72,9 @@ interface IOxidationModel {
      */
     public double getDefault_Xi();
     
+    public String getName();
+    
+    public void setName(String name);
 }
 
 /**
@@ -94,6 +97,8 @@ public class SiOxidationModel implements IOxidationModel
     protected SiWafer wafer;
     
     protected double _Xi; // Default
+    
+    protected String name;
     
     @Override
     public double getEaBA()
@@ -154,6 +159,18 @@ public class SiOxidationModel implements IOxidationModel
     public double getDefault_Xi()
     {
         return _Xi;
+    }
+    
+    @Override
+    public String getName()
+    {
+        return name;
+    }
+    
+    @Override
+    public void setName(String name)
+    {
+        this.name = name;
     }
     
     /**

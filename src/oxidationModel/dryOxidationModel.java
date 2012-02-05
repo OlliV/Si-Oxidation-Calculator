@@ -23,12 +23,14 @@ public class dryOxidationModel extends SiOxidationModel
         switch(wafer.getOrientation())
         {
             case mi100:
+                name = "Dry oxidation <100>";
                 EaBA = 2.00;
                 EaB = 1.23;
                 D0BA = 3700000.0;
                 D0B = 772.0;
                 break;
             case mi111:
+                name = "Dry oxidation <111>";
                 EaBA = 2.00;
                 EaB = 1.23;
                 D0BA = 6230000.0;
