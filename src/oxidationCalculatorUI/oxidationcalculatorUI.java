@@ -2,17 +2,17 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package oxidationcalculator;
+package oxidationCalculatorUI;
 
 import javax.swing.table.TableColumn;
-import oxidationcalculator.OxidationCalculator;
+import oxidationCalculatorUI.OxidationCalculator;
 import javax.swing.JFileChooser;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
-import oxidationSession.SiWafer;
+import oxidationModel.SiWafer;
 import oxidationcalculator.FileOperations.SimpleFileFilter;
 import javax.swing.JOptionPane;
 
@@ -114,7 +114,7 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
             }
         });
 
-        jTable.setModel(oxidationcalculator.OxidationCalculator.session.tableModelSession);
+        jTable.setModel(oxidationCalculatorUI.OxidationCalculator.session.tableModelSession);
         jTable.setColumnSelectionAllowed(true);
         jScrollPane.setViewportView(jTable);
         jTable.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -213,7 +213,7 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Oxidation models"));
 
-        jTableOxidationModels.setModel(oxidationcalculator.OxidationCalculator.session.tableModelOxidationModels);
+        jTableOxidationModels.setModel(oxidationCalculatorUI.OxidationCalculator.session.tableModelOxidationModels);
         jScrollPane1.setViewportView(jTableOxidationModels);
 
         jButtonAddModel.setText("Add");

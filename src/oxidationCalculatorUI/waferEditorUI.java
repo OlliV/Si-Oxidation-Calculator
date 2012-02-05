@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package oxidationcalculator;
+package oxidationCalculatorUI;
 
 import java.awt.Color;
 import javax.swing.InputVerifier;
@@ -15,7 +15,7 @@ import java.io.FileInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
 import javax.swing.*;
-import oxidationSession.SiWafer;
+import oxidationModel.SiWafer;
 import oxidationcalculator.FileOperations.SimpleFileFilter;
 
 /**
@@ -325,6 +325,14 @@ public class waferEditorUI extends javax.swing.JFrame {
         if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
         {
             waferFile = fc.getSelectedFile();
+            if (waferFile.exists())
+            {
+                int response = JOptionPane.showConfirmDialog (null,
+                "Overwrite existing file?","Confirm Overwrite",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+                if (response == JOptionPane.CANCEL_OPTION) return;
+            }
             saveFile();
         }
     }

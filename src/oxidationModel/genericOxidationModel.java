@@ -4,8 +4,6 @@
  */
 package oxidationModel;
 
-import oxidationSession.SiWafer;
-
 /**
  * Generic oxidation model for silicon wafers
  * @author ollivanhoja

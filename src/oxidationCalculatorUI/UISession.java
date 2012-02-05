@@ -2,10 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package oxidationcalculator;
+package oxidationCalculatorUI;
 
 import oxidationModel.*;
-import oxidationSession.SiWafer;
+import oxidationModel.SiWafer;
 import oxidationSession.oxidationSession;
 import javax.swing.table.AbstractTableModel;
 

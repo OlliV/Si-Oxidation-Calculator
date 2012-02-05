@@ -209,7 +209,7 @@
         <Component class="javax.swing.JTable" name="jTable">
           <Properties>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="oxidationcalculator.OxidationCalculator.session.tableModelSession" type="code"/>
+              <Connection code="oxidationCalculatorUI.OxidationCalculator.session.tableModelSession" type="code"/>
             </Property>
             <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
               <TableColumnModel selectionModel="1">
@@ -451,7 +451,7 @@
             <Component class="javax.swing.JTable" name="jTableOxidationModels">
               <Properties>
                 <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="oxidationcalculator.OxidationCalculator.session.tableModelOxidationModels" type="code"/>
+                  <Connection code="oxidationCalculatorUI.OxidationCalculator.session.tableModelOxidationModels" type="code"/>
                 </Property>
               </Properties>
             </Component>
