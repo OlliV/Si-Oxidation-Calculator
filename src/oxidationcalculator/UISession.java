@@ -17,7 +17,8 @@ public class UISession
 {
     oxidationSession oxs;
     SiOxidationModelArray oxidationModels;
-    OxidationSessionTableModel tableModel;
+    OxidationSessionTableModel tableModelSession;
+    OxidationModelTableModel tableModelOxidationModels;
 
     public SiWafer getWafer()
     {
@@ -43,7 +44,8 @@ public class UISession
         wafer = null;
         oxidationModels = new SiOxidationModelArray();
         oxs = new oxidationSession();
-        tableModel = new OxidationSessionTableModel();
+        tableModelSession = new OxidationSessionTableModel();
+        tableModelOxidationModels = new OxidationModelTableModel();
     }
 
     void setWafer(SiWafer.eWaferOrientation orientation, double h)
@@ -56,6 +58,17 @@ public class UISession
         oxidationModels.add(procDry, procDry.toString());
         oxidationModels.add(procWet, procWet.toString());
     }
+    
+    void setWafer(SiWafer wafer)
+    {
+        this.wafer = wafer;
+        
+        // Update standard oxidation models
+        dryOxidationModel procDry = new dryOxidationModel(wafer);
+        wetOxidationModel procWet = new wetOxidationModel(wafer);
+        oxidationModels.add(procDry, procDry.toString());
+        oxidationModels.add(procWet, procWet.toString());
+    }
 
     void addConsttPhase(double T, double t, int modelI)
     {
@@ -63,9 +76,21 @@ public class UISession
         noData = false;
     }
     
+    void addConsttPhase(int modelI)
+    {
+        oxs.addPhase(0, 0, oxidationModels.get(modelI), false);
+        noData = false;
+    }
+    
     void addConstXoPhase(double T, double Xo, int modelI)
     {
         oxs.addPhase(T, Xo, oxidationModels.get(modelI), true);
+        noData = false;
+    }
+    
+    void addConstXoPhase(int modelI)
+    {
+        oxs.addPhase(0, 0, oxidationModels.get(modelI), true);
         noData = false;
     }
     
@@ -113,7 +138,10 @@ public class UISession
                 case 0: // Xi
                     return phase.getXi();
                 case 1: // Xo
-                    return phase.getXoPhase();
+                    if (phase.getCalc_t())
+                        return phase.getXoSet();
+                    else
+                        return phase.getXoPhase();
                 case 2: // T
                     return phase.T;
                 case 3: // Calculation
@@ -144,17 +172,11 @@ public class UISession
                     phase.T = (Double)aValue;
                     break;
                 case 4: // t
-                    phase.T = (Double)aValue;
+                    phase.t = ((Double)aValue)/60;
                     break;
             }
         }
 
-        /*
-        * JTable uses this method to determine the default renderer/
-        * editor for each cell.  If we didn't implement this method,
-        * then the last column would contain text ("true"/"false"),
-        * rather than a check box.
-        */
         @Override
         public Class getColumnClass(int c)
         {
@@ -168,15 +190,83 @@ public class UISession
             {
                 case 0:
                     return false;
-                case 2:
+                case 1:
                     return OxidationCalculator.session.oxs.getPhase(row).getCalc_t();
                 case 3:
                     return false;
                 case 4:
                     return !(OxidationCalculator.session.oxs.getPhase(row).getCalc_t());
+                case 5:
+                    return false;
+                case 6:
+                    return false;
                 default:
                     return true;
             }
+        }
+    }
+    
+    class OxidationModelTableModel extends AbstractTableModel
+    {
+        private String[] columnNames = {"Name",
+                                        "D_0(BA)",
+                                        "D_0(B)",
+                                        "E_a(BA)",
+                                        "E_a(B)",
+                                        "X_I(def)"};
+        
+        @Override
+        public int getColumnCount()
+        {
+            return columnNames.length;
+        }
+        
+        @Override
+        public int getRowCount()
+        {
+            return oxidationModels.size();
+        }
+        
+        @Override
+        public String getColumnName(int col)
+        {
+            return columnNames[col];
+        }
+        
+        @Override
+        public Object getValueAt(int row, int col)
+        {
+            SiOxidationModel model;
+            model = oxidationModels.get(row);
+            
+            switch (col)
+            {
+                case 0: // Name
+                    return model.getName();
+                case 1: // D_0(BA)
+                    return model.getD0BA();
+                case 2: // D_0(B)
+                    return model.getD0B();
+                case 3: // E_a(BA)
+                    return model.getEaBA();
+                case 4: // E_a(B)
+                    return model.getEaB();
+                case 5: // X_I(def)
+                    return model.getDefault_Xi();
+                default: throw new IndexOutOfBoundsException();
+            }
+        }
+        
+        @Override
+        public Class getColumnClass(int c)
+        {
+            return getValueAt(0, c).getClass();
+        }
+        
+        @Override
+        public boolean isCellEditable(int row, int col)
+        {
+            return false;
         }
     }
 }

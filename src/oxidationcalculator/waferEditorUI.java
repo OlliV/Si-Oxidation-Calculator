@@ -8,7 +8,15 @@ import java.awt.Color;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
+import javax.swing.JFileChooser;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
+import javax.swing.*;
 import oxidationSession.SiWafer;
+import oxidationcalculator.FileOperations.SimpleFileFilter;
 
 /**
  *
@@ -16,11 +24,18 @@ import oxidationSession.SiWafer;
  */
 public class waferEditorUI extends javax.swing.JFrame {
 
+    JFileChooser fc;
+    SiWafer wafer;
+    File waferFile;
+    
     /**
      * Creates new form waferEditorUI
      */
     public waferEditorUI() {
         initComponents();
+        wafer = new SiWafer(SiWafer.eWaferOrientation.mi100, 0);
+        fc = new JFileChooser();
+        fc.addChoosableFileFilter(new SimpleFileFilter("wafer", "Si wafer file"));
     }
 
     /**
@@ -65,6 +80,11 @@ public class waferEditorUI extends javax.swing.JFrame {
 
         for (SiWafer.eWaferOrientation item : SiWafer.eWaferOrientation.values())
         jComboBoxCrystalOrientation.addItem(item);
+        jComboBoxCrystalOrientation.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxCrystalOrientationActionPerformed(evt);
+            }
+        });
 
         jLabelH.setText("h:");
 
@@ -133,9 +153,19 @@ public class waferEditorUI extends javax.swing.JFrame {
         jFileMenu.setText("File");
 
         jMenuItemOpen.setText("Open");
+        jMenuItemOpen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemOpenActionPerformed(evt);
+            }
+        });
         jFileMenu.add(jMenuItemOpen);
 
         jMenuItemSave.setText("Save");
+        jMenuItemSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemSaveActionPerformed(evt);
+            }
+        });
         jFileMenu.add(jMenuItemSave);
 
         jMenuItemSaveAs.setText("Save As...");
@@ -182,19 +212,73 @@ public class waferEditorUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Save As... clicked
+     * @param evt 
+     */
     private void jMenuItemSaveAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSaveAsActionPerformed
-        // TODO add your handling code here:
+        openSaveAsDialog();
     }//GEN-LAST:event_jMenuItemSaveAsActionPerformed
 
     private void jTextFieldHActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldHActionPerformed
-        // TODO add your handling code here:
+        wafer.set_h(Double.parseDouble(jTextFieldH.getText()));
     }//GEN-LAST:event_jTextFieldHActionPerformed
 
     private void jMenuItemQuitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemQuitActionPerformed
         this.dispose();
     }//GEN-LAST:event_jMenuItemQuitActionPerformed
 
-    protected static class InputVerifierDecimal extends InputVerifier {
+    /**
+     * Save clicked
+     * @param evt 
+     */
+    private void jMenuItemSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSaveActionPerformed
+        if(waferFile != null)
+            saveFile();
+        else
+            openSaveAsDialog();
+    }//GEN-LAST:event_jMenuItemSaveActionPerformed
+
+    /**
+     * Wafer crystal orientation selected
+     * @param evt 
+     */
+    private void jComboBoxCrystalOrientationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxCrystalOrientationActionPerformed
+        wafer.setOrientation((SiWafer.eWaferOrientation)jComboBoxCrystalOrientation.getSelectedItem());
+    }//GEN-LAST:event_jComboBoxCrystalOrientationActionPerformed
+
+    /**
+     * File open requested
+     * @param evt 
+     */
+    private void jMenuItemOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemOpenActionPerformed
+        if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
+        {
+            // Try to deserialize
+            try
+            {
+                waferFile = fc.getSelectedFile();
+                FileInputStream fin = new FileInputStream(waferFile.getAbsolutePath());
+                ObjectInputStream ois = new ObjectInputStream(fin);
+                wafer = (SiWafer)ois.readObject();
+                ois.close();
+            }
+            catch (Exception e)
+            {
+                JOptionPane.showMessageDialog(null, "Can't open wafer file.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            // Update fields
+            jComboBoxCrystalOrientation.setSelectedItem(wafer.getOrientation());
+            jTextFieldH.setText(String.valueOf(wafer.get_h()));
+            jTextFieldH.isValidateRoot();
+        }
+    }//GEN-LAST:event_jMenuItemOpenActionPerformed
+
+    /**
+     * Input verifier for decimal value
+     */
+    protected class InputVerifierDecimal extends InputVerifier {
         @Override
         public boolean verify(JComponent input)
         {
@@ -206,10 +290,42 @@ public class waferEditorUI extends javax.swing.JFrame {
             catch (NumberFormatException e)
             {
                 textField.setBackground(Color.PINK);
+                jMenuItemSave.setEnabled(false);
+                jMenuItemSaveAs.setEnabled(false);
                 return false;
             }
             textField.setBackground(Color.WHITE);
+            jMenuItemSave.setEnabled(true);
+            jMenuItemSaveAs.setEnabled(true);
             return true;
+        }
+    }
+    
+    /**
+     * Save (serialize) wafer to file
+     */
+    private void saveFile()
+    {
+        wafer.set_h(Double.parseDouble(jTextFieldH.getText()));
+        try
+        {
+            FileOutputStream fout = new FileOutputStream(waferFile.getAbsolutePath());
+            ObjectOutputStream oos = new ObjectOutputStream(fout);
+            oos.writeObject(wafer);
+            oos.close();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+    
+    private void openSaveAsDialog()
+    {
+        if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
+        {
+            waferFile = fc.getSelectedFile();
+            saveFile();
         }
     }
     

@@ -30,7 +30,7 @@ public class wetOxidationModel extends SiOxidationModel
                 D0B = 386.0;
                 break;
             case mi111:
-                name = "Wet oxidation <100>";
+                name = "Wet oxidation <111>";
                 EaBA = 2.05;
                 EaB = 0.78;
                 D0BA = 163000000.0;

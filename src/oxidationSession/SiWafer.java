@@ -4,11 +4,13 @@
  */
 package oxidationSession;
 
+import java.io.Serializable;
+
 /**
  * Silicon wafer material
  * @author ollivanhoja
  */
-public class SiWafer {
+public class SiWafer implements Serializable {
 
     /**
      * Crystal orientation of the wafer
@@ -17,40 +19,12 @@ public class SiWafer {
     public eWaferOrientation getOrientation() {
         return orientation;
     }
-
     /**
      * @param orientation the crystal orientation to set
      */
     public void setOrientation(eWaferOrientation orientation) {
         this.orientation = orientation;
-    }
-    
-    /**
-     * Possible crystal orientations for silicon wafer
-     */
-    public enum eWaferOrientation
-    {
-        mi100,
-        mi111;
-        
-        @Override
-        public String toString(){
-            String[] splitNames = name().toLowerCase().split("_");
-            StringBuffer fixedName = new StringBuffer();
-
-            for(int i = 0; i < splitNames.length; i++)
-            {
-                String firstLetter = splitNames[i].substring(0, 1).toUpperCase(),
-                restOfWord = splitNames[i].substring(1),
-                spacer = (i == splitNames.length) ? "" : " ";
-
-                fixedName.append(firstLetter).append(restOfWord).append(spacer);
-            }
-
-            return fixedName.toString();
-        }
-    }
-    
+    }  
     /**
      * X_o = oxidation layer thickness on wafer
      */
@@ -85,7 +59,7 @@ public class SiWafer {
     
     private eWaferOrientation orientation;
     private double h;
-    private double Xo;
+    private transient double Xo;
    
     
     /**
@@ -98,5 +72,31 @@ public class SiWafer {
         this.orientation = orientation;
         this.h = h;
         Xo = 0.0;
+    }
+    
+        /**
+     * Possible crystal orientations for silicon wafer
+     */
+    public enum eWaferOrientation
+    {
+        mi100,
+        mi111;
+        
+        @Override
+        public String toString(){
+            String[] splitNames = name().toLowerCase().split("_");
+            StringBuffer fixedName = new StringBuffer();
+
+            for(int i = 0; i < splitNames.length; i++)
+            {
+                String firstLetter = splitNames[i].substring(0, 1).toUpperCase(),
+                restOfWord = splitNames[i].substring(1),
+                spacer = (i == splitNames.length) ? "" : " ";
+
+                fixedName.append(firstLetter).append(restOfWord).append(spacer);
+            }
+
+            return fixedName.toString();
+        }
     }
 }

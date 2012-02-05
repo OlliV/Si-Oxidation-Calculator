@@ -6,6 +6,15 @@ package oxidationcalculator;
 
 import javax.swing.table.TableColumn;
 import oxidationcalculator.OxidationCalculator;
+import javax.swing.JFileChooser;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
+import oxidationSession.SiWafer;
+import oxidationcalculator.FileOperations.SimpleFileFilter;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -13,11 +22,19 @@ import oxidationcalculator.OxidationCalculator;
  */
 public class oxidationcalculatorUI extends javax.swing.JFrame {
 
+    JFileChooser fc;
+    File waferFile;
+    
     /**
      * Creates new form oxidationcalculatorUI
      */
     public oxidationcalculatorUI() {
-        initComponents();
+        initComponents();        
+        fc = new JFileChooser();
+        fc.addChoosableFileFilter(new SimpleFileFilter("wafer", "Si wafer file"));
+        
+        // Wafer not selected so disable some buttons
+        waferSelected(false);
     }
 
     /**
@@ -34,9 +51,25 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
         jCalculateButton = new javax.swing.JButton();
         jScrollPane = new javax.swing.JScrollPane();
         jTable = new javax.swing.JTable();
-        jLabelWafer = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
         jWaferTextField = new javax.swing.JTextField();
         jSelectWaferButton = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jTextField_t_tot = new javax.swing.JTextField();
+        jTextField_h_initial = new javax.swing.JTextField();
+        jTextField_h_after = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jTextFieldOrientation = new javax.swing.JTextField();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTableOxidationModels = new javax.swing.JTable();
+        jButtonAddModel = new javax.swing.JButton();
+        jButtonRemoveModel = new javax.swing.JButton();
         jMenuBar = new javax.swing.JMenuBar();
         jFileMenu = new javax.swing.JMenu();
         jMenuItemOpen = new javax.swing.JMenuItem();
@@ -81,12 +114,12 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
             }
         });
 
-        jTable.setModel(oxidationcalculator.OxidationCalculator.session.tableModel);
+        jTable.setModel(oxidationcalculator.OxidationCalculator.session.tableModelSession);
         jTable.setColumnSelectionAllowed(true);
         jScrollPane.setViewportView(jTable);
         jTable.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
-        jLabelWafer.setText("Wafer:");
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Wafer"));
 
         jWaferTextField.setEditable(false);
 
@@ -96,6 +129,122 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
                 jSelectWaferButtonActionPerformed(evt);
             }
         });
+
+        jLabel1.setText("t_tot:");
+
+        jLabel2.setText("h_initial:");
+
+        jLabel3.setText("h_after:");
+
+        jTextField_t_tot.setEditable(false);
+
+        jTextField_h_initial.setEditable(false);
+
+        jTextField_h_after.setEditable(false);
+
+        jLabel4.setText("unit");
+
+        jLabel5.setText("unit");
+
+        jLabel6.setText("unit");
+
+        jLabel7.setText("orientation:");
+
+        jTextFieldOrientation.setEditable(false);
+
+        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jPanel1Layout.createSequentialGroup()
+                        .add(jWaferTextField)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jSelectWaferButton))
+                    .add(jPanel1Layout.createSequentialGroup()
+                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jLabel7)
+                            .add(jLabel3)
+                            .add(jLabel2)
+                            .add(jLabel1))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                            .add(jTextField_h_after, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)
+                            .add(jTextField_h_initial)
+                            .add(jTextField_t_tot)
+                            .add(jTextFieldOrientation))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jLabel5)
+                            .add(jLabel4)
+                            .add(jLabel6))
+                        .add(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jWaferTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jSelectWaferButton))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 18, Short.MAX_VALUE)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel7)
+                    .add(jTextFieldOrientation, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jTextField_t_tot, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jLabel1)
+                    .add(jLabel4))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jTextField_h_initial, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jLabel5)
+                    .add(jLabel2))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel3)
+                    .add(jTextField_h_after, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jLabel6))
+                .addContainerGap())
+        );
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Oxidation models"));
+
+        jTableOxidationModels.setModel(oxidationcalculator.OxidationCalculator.session.tableModelOxidationModels);
+        jScrollPane1.setViewportView(jTableOxidationModels);
+
+        jButtonAddModel.setText("Add");
+        jButtonAddModel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonAddModelActionPerformed(evt);
+            }
+        });
+
+        jButtonRemoveModel.setText("Remove");
+
+        org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel2Layout.createSequentialGroup()
+                .add(jButtonAddModel)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jButtonRemoveModel)
+                .addContainerGap())
+            .add(jScrollPane1)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel2Layout.createSequentialGroup()
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 149, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jButtonAddModel)
+                    .add(jButtonRemoveModel)))
+        );
 
         jFileMenu.setText("File");
 
@@ -170,19 +319,17 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 899, Short.MAX_VALUE)
                     .add(layout.createSequentialGroup()
                         .add(jAddButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jRemoveButton)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                        .add(jLabelWafer)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jWaferTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 105, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jSelectWaferButton)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 160, Short.MAX_VALUE)
+                        .add(0, 0, Short.MAX_VALUE)
                         .add(jCalculateButton))
-                    .add(jScrollPane))
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                        .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                        .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -190,30 +337,84 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jScrollPane, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 283, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jAddButton)
-                    .add(jRemoveButton)
-                    .add(jCalculateButton)
-                    .add(jLabelWafer)
-                    .add(jWaferTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jSelectWaferButton))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(jRemoveButton))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(layout.createSequentialGroup()
+                        .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .add(jCalculateButton)
+                        .addContainerGap())
+                    .add(layout.createSequentialGroup()
+                        .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(0, 0, Short.MAX_VALUE))))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jAddButtonActionPerformed
-        // TODO add your handling code here:
+        Object[] possibilities = {"Xo", "t"};
+        String s = (String)JOptionPane.showInputDialog(
+            this,
+            "Calculate:\n",
+            "Add oxidation phase",
+            JOptionPane.PLAIN_MESSAGE,
+            null,
+            possibilities,
+            "Xo");
+
+            if (s.equals("t"))
+            {
+                // TODO add model selection
+                OxidationCalculator.session.addConstXoPhase(0);
+            }
+            else if (s.equals("Xo"))
+            {
+                // TODO add model selection
+                OxidationCalculator.session.addConsttPhase(0);
+            }
+            
+            // Update table
+            jTable.updateUI();
     }//GEN-LAST:event_jAddButtonActionPerformed
 
+    /**
+     * Removal of last or selected oxidation phase was requested
+     * @param evt 
+     */
     private void jRemoveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRemoveButtonActionPerformed
-        // TODO add your handling code here:
+        if (jTable.getSelectedRow() >= 0) // Remove selected
+            OxidationCalculator.session.oxs.removePhase(jTable.getSelectedRow());
+        else if (OxidationCalculator.session.oxs.getSize() > 0) // Remove last
+            OxidationCalculator.session.oxs.removePhase();
+        jTable.updateUI();
     }//GEN-LAST:event_jRemoveButtonActionPerformed
 
     private void jSelectWaferButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jSelectWaferButtonActionPerformed
-        // TODO add your handling code here:
+        if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
+        {
+            try
+            {
+                waferFile = fc.getSelectedFile();
+                FileInputStream fin = new FileInputStream(waferFile.getAbsolutePath());
+                ObjectInputStream ois = new ObjectInputStream(fin);
+                OxidationCalculator.session.setWafer((SiWafer)ois.readObject());
+                ois.close();
+            }
+            catch (Exception e)
+            {
+                JOptionPane.showMessageDialog(null, "Can't open wafer file.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            // Update fields
+            jWaferTextField.setText(waferFile.getName());
+            jTextFieldOrientation.setText(OxidationCalculator.session.getWafer().getOrientation().toString());
+            jTextField_h_initial.setText(String.valueOf((float)OxidationCalculator.session.getWafer().get_h()));
+            waferSelected(true);
+        }
     }//GEN-LAST:event_jSelectWaferButtonActionPerformed
 
     private void jMenuItemWaferEditorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemWaferEditorActionPerformed
@@ -230,9 +431,36 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItemQuitActionPerformed
 
     private void jCalculateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCalculateButtonActionPerformed
-        OxidationCalculator.session.oxs.calculate();
+        try
+        {
+            OxidationCalculator.session.oxs.calculate();
+        }
+        catch (Exception e)
+        {
+            // TODO There should be other messages too
+            JOptionPane.showMessageDialog(null, "There is no oxidation phases to calculate.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        
+        // Update UI
         jTable.updateUI();
+        jTextField_t_tot.setText(String.valueOf((float)OxidationCalculator.session.oxs.get_t_tot()));
+        jTextField_h_after.setText(String.valueOf((float)OxidationCalculator.session.oxs.get_hW()));
     }//GEN-LAST:event_jCalculateButtonActionPerformed
+
+    private void jButtonAddModelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddModelActionPerformed
+        // TODO open model from file
+        jTableOxidationModels.updateUI();
+    }//GEN-LAST:event_jButtonAddModelActionPerformed
+    
+    private void waferSelected(boolean selected)
+    {
+        jCalculateButton.setEnabled(selected);
+        jAddButton.setEnabled(selected);
+        jRemoveButton.setEnabled(selected);
+        jMenuItemSave.setEnabled(selected);
+        jMenuItemSaveAs.setEnabled(selected);
+        jTableOxidationModels.updateUI();
+    }
     
     /**
      * @param args the command line arguments
@@ -278,10 +506,18 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jAddButton;
+    private javax.swing.JButton jButtonAddModel;
+    private javax.swing.JButton jButtonRemoveModel;
     private javax.swing.JButton jCalculateButton;
     private javax.swing.JMenu jEditMenu;
     private javax.swing.JMenu jFileMenu;
-    private javax.swing.JLabel jLabelWafer;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JMenuBar jMenuBar;
     private javax.swing.JMenuItem jMenuItemCopy;
     private javax.swing.JMenuItem jMenuItemCut;
@@ -296,13 +532,21 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItemSettings;
     private javax.swing.JMenuItem jMenuItemUndo;
     private javax.swing.JMenuItem jMenuItemWaferEditor;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JButton jRemoveButton;
     private javax.swing.JScrollPane jScrollPane;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton jSelectWaferButton;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JTable jTable;
+    private javax.swing.JTable jTableOxidationModels;
+    private javax.swing.JTextField jTextFieldOrientation;
+    private javax.swing.JTextField jTextField_h_after;
+    private javax.swing.JTextField jTextField_h_initial;
+    private javax.swing.JTextField jTextField_t_tot;
     private javax.swing.JMenu jToolsMenu;
     private javax.swing.JTextField jWaferTextField;
     // End of variables declaration//GEN-END:variables
