@@ -5,6 +5,7 @@
 package oxidationModel;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  *
@@ -21,9 +22,33 @@ public class SiOxidationModelArray {
         return this.oxidationModels.get(i);
     }
     
+    public SiOxidationModel get(String name)
+    {
+        for (Iterator<SiOxidationModel> it = oxidationModels.iterator(); it.hasNext();) {
+            SiOxidationModel model = it.next();
+            
+            if (model.name.equals(name))
+                return model;
+        }
+        
+        throw new IndexOutOfBoundsException();
+    }
+    
     public String getName(int i)
     {
         return this.oxidationModels.get(i).getName();
+    }
+    
+    public String[] getNames()
+    {
+        int size = oxidationModels.size();
+        String[] names = new String[size];
+        for (int i=0; i < size; i++)
+        {
+            names[i] = oxidationModels.get(i).getName();
+        }
+        
+        return names;
     }
     
     public void add(SiOxidationModel model)

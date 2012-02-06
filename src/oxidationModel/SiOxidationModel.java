@@ -4,11 +4,14 @@
  */
 package oxidationModel;
 
+import java.io.Serializable;
+
 /**
  * Oxidation model for silicon wafers
  * @author ollivanhoja
  */
-interface IOxidationModel {
+interface IOxidationModel extends Serializable
+{
     /**
      * E_A = Activation energy for linear rate constant
      * @return E_a for B/A
@@ -92,7 +95,7 @@ public class SiOxidationModel implements IOxidationModel
     protected double D0BA;
     protected double D0B;
     
-    protected SiWafer wafer;
+    protected transient SiWafer wafer;
     
     protected double _Xi; // Default
     
@@ -152,11 +155,14 @@ public class SiOxidationModel implements IOxidationModel
     {
         this.wafer = wafer;
     }
-
     @Override
     public double getDefault_Xi()
     {
         return _Xi;
+    }
+    public void setDefault_Xi(double Xi)
+    {
+        this._Xi = Xi;
     }
     
     @Override

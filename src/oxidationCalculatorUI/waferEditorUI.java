@@ -23,7 +23,6 @@ import oxidationcalculator.FileOperations.SimpleFileFilter;
  * @author ollivanhoja
  */
 public class waferEditorUI extends javax.swing.JFrame {
-
     JFileChooser fc;
     SiWafer wafer;
     File waferFile;
@@ -68,6 +67,8 @@ public class waferEditorUI extends javax.swing.JFrame {
         jMenuItem2.setText("jMenuItem2");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Wafer Editor");
+        setResizable(false);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("NameOfWafer"));
         jPanel2.setName("WaferType");
@@ -88,7 +89,7 @@ public class waferEditorUI extends javax.swing.JFrame {
 
         jLabelH.setText("h:");
 
-        jTextFieldH.setText("jTextField1");
+        jTextFieldH.setText("0.0");
         jTextFieldH.setInputVerifier(new InputVerifierDecimal());
         jTextFieldH.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -96,7 +97,7 @@ public class waferEditorUI extends javax.swing.JFrame {
             }
         });
 
-        jLabelHUnit.setText("unit");
+        jLabelHUnit.setText("um");
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -107,10 +108,10 @@ public class waferEditorUI extends javax.swing.JFrame {
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jLabelH)
                     .add(jLabelCrystalOrientation))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 124, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 129, Short.MAX_VALUE)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
                     .add(jPanel1Layout.createSequentialGroup()
-                        .add(jTextFieldH, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(jTextFieldH, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 84, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jLabelHUnit)
                         .addContainerGap())

@@ -76,9 +76,9 @@ public class UISession
         noData = false;
     }
     
-    void addConsttPhase(int modelI)
+    void addConsttPhase(SiOxidationModel model)
     {
-        oxs.addPhase(0, 0, oxidationModels.get(modelI), false);
+        oxs.addPhase(0, 0, model, false);
         noData = false;
     }
     
@@ -88,20 +88,20 @@ public class UISession
         noData = false;
     }
     
-    void addConstXoPhase(int modelI)
+    void addConstXoPhase(SiOxidationModel model)
     {
-        oxs.addPhase(0, 0, oxidationModels.get(modelI), true);
+        oxs.addPhase(0, 0, model, true);
         noData = false;
     }
     
     class OxidationSessionTableModel extends AbstractTableModel
     {
-        private String[] columnNames = {"Xi",
-                                        "Xo",
-                                        "T",
+        private String[] columnNames = {"Xi/μm",
+                                        "Xo/μm",
+                                        "T/K",
                                         "Calculation mode",
-                                        "t phase",
-                                        "t total",
+                                        "t phase/min",
+                                        "t total/min",
                                         "Oxidation model"};
         @Override
         public int getColumnCount()
@@ -149,8 +149,10 @@ public class UISession
                 case 4: // t
                     return phase.t * 60;
                 case 5: // t_tot
-                    // TODO return total
-                    return 0;
+                    double total = 0;
+                    for (int i = 0; i <= row; i++)
+                        total += oxs.getPhase(i).t * 60;
+                    return total;
                 case 6: // Oxidation model
                     return phase.oModel.getName();
                 default: throw new IndexOutOfBoundsException();
@@ -253,6 +255,36 @@ public class UISession
                     return model.getEaB();
                 case 5: // X_I(def)
                     return model.getDefault_Xi();
+                default: throw new IndexOutOfBoundsException();
+            }
+        }
+        
+        @Override
+        public void setValueAt(Object aValue, int row, int col)
+        {
+            SiOxidationModel model;
+            model = oxidationModels.get(row);
+            
+            switch (col)
+            {
+                case 0: // Name
+                    model.setName((String)aValue);
+                    break;
+                case 1: // D_0(BA)
+                    model.setD0BA((Double)aValue);
+                    break;
+                case 2: // D_0(B)
+                    model.setD0B((Double)aValue);
+                    break;
+                case 3: // E_a(BA)
+                    model.setEaBA((Double)aValue);
+                    break;
+                case 4: // E_a(B)
+                    model.setEaB((Double)aValue);
+                    break;
+                case 5: // X_I(def)
+                    model.setDefault_Xi((Double)aValue);
+                    break;
                 default: throw new IndexOutOfBoundsException();
             }
         }

@@ -15,6 +15,7 @@ import java.io.ObjectInputStream;
 import oxidationModel.SiWafer;
 import oxidationcalculator.FileOperations.SimpleFileFilter;
 import javax.swing.JOptionPane;
+import oxidationModel.SiOxidationModel;
 
 /**
  *
@@ -22,7 +23,7 @@ import javax.swing.JOptionPane;
  */
 public class oxidationcalculatorUI extends javax.swing.JFrame {
 
-    JFileChooser fc;
+    JFileChooser fcWaferFile;
     File waferFile;
     
     /**
@@ -30,8 +31,8 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
      */
     public oxidationcalculatorUI() {
         initComponents();        
-        fc = new JFileChooser();
-        fc.addChoosableFileFilter(new SimpleFileFilter("wafer", "Si wafer file"));
+        fcWaferFile = new JFileChooser();
+        fcWaferFile.addChoosableFileFilter(new SimpleFileFilter("wafer", "Si wafer file"));
         
         // Wafer not selected so disable some buttons
         waferSelected(false);
@@ -142,11 +143,11 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
 
         jTextField_h_after.setEditable(false);
 
-        jLabel4.setText("unit");
+        jLabel4.setText("min");
 
-        jLabel5.setText("unit");
+        jLabel5.setText("μm");
 
-        jLabel6.setText("unit");
+        jLabel6.setText("μm");
 
         jLabel7.setText("orientation:");
 
@@ -249,12 +250,25 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
         jFileMenu.setText("File");
 
         jMenuItemOpen.setText("Open");
+        jMenuItemOpen.setEnabled(false);
+        jMenuItemOpen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemOpenActionPerformed(evt);
+            }
+        });
         jFileMenu.add(jMenuItemOpen);
 
         jMenuItemSave.setText("Save");
+        jMenuItemSave.setEnabled(false);
+        jMenuItemSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemSaveActionPerformed(evt);
+            }
+        });
         jFileMenu.add(jMenuItemSave);
 
         jMenuItemSaveAs.setText("Save As...");
+        jMenuItemSaveAs.setEnabled(false);
         jFileMenu.add(jMenuItemSaveAs);
         jFileMenu.add(jSeparator1);
 
@@ -269,6 +283,7 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
         jMenuBar.add(jFileMenu);
 
         jEditMenu.setText("Edit");
+        jEditMenu.setEnabled(false);
 
         jMenuItemUndo.setText("Undo");
         jEditMenu.add(jMenuItemUndo);
@@ -294,6 +309,11 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
         jToolsMenu.setText("Tools");
 
         jMenuItemModelEditor.setText("Oxidation Model Editor");
+        jMenuItemModelEditor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemModelEditorActionPerformed(evt);
+            }
+        });
         jToolsMenu.add(jMenuItemModelEditor);
 
         jMenuItemWaferEditor.setText("Wafer Editor");
@@ -306,6 +326,7 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
         jToolsMenu.add(jSeparator3);
 
         jMenuItemSettings.setText("Settings");
+        jMenuItemSettings.setEnabled(false);
         jToolsMenu.add(jMenuItemSettings);
 
         jMenuBar.add(jToolsMenu);
@@ -365,16 +386,35 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
             null,
             possibilities,
             "Xo");
+        String strModel = (String)JOptionPane.showInputDialog(
+            this,
+            "Use oxidation model:\n",
+            "Add oxidation phase",
+            JOptionPane.PLAIN_MESSAGE,
+            null,
+            OxidationCalculator.session.oxidationModels.getNames(),
+            "Xo");
 
+            SiOxidationModel model;
+            try
+            {
+                model = OxidationCalculator.session.oxidationModels.get(strModel);
+            }
+            catch (Exception e)
+            {
+                JOptionPane.showMessageDialog(null, "Can't select oxidation model.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
             if (s.equals("t"))
             {
                 // TODO add model selection
-                OxidationCalculator.session.addConstXoPhase(0);
+                OxidationCalculator.session.addConstXoPhase(model);
             }
             else if (s.equals("Xo"))
             {
                 // TODO add model selection
-                OxidationCalculator.session.addConsttPhase(0);
+                OxidationCalculator.session.addConsttPhase(model);
             }
             
             // Update table
@@ -394,11 +434,11 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jRemoveButtonActionPerformed
 
     private void jSelectWaferButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jSelectWaferButtonActionPerformed
-        if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
+        if (fcWaferFile.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
         {
             try
             {
-                waferFile = fc.getSelectedFile();
+                waferFile = fcWaferFile.getSelectedFile();
                 FileInputStream fin = new FileInputStream(waferFile.getAbsolutePath());
                 ObjectInputStream ois = new ObjectInputStream(fin);
                 OxidationCalculator.session.setWafer((SiWafer)ois.readObject());
@@ -443,22 +483,65 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
         
         // Update UI
         jTable.updateUI();
-        jTextField_t_tot.setText(String.valueOf((float)OxidationCalculator.session.oxs.get_t_tot()));
+        jTextField_t_tot.setText(String.valueOf((float)OxidationCalculator.session.oxs.get_t_tot()*60));
         jTextField_h_after.setText(String.valueOf((float)OxidationCalculator.session.oxs.get_hW()));
     }//GEN-LAST:event_jCalculateButtonActionPerformed
 
     private void jButtonAddModelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddModelActionPerformed
-        // TODO open model from file
+        JFileChooser fc;
+        File oxidationModelFile;
+        SiOxidationModel oxModel;
+        
+        fc = new JFileChooser();
+        fc.addChoosableFileFilter(new SimpleFileFilter("oxm", "Oxidation model file"));
+        
+        if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
+        {
+            // Try to deserialize
+            try
+            {
+                oxidationModelFile = fc.getSelectedFile();
+                FileInputStream fin = new FileInputStream(oxidationModelFile.getAbsolutePath());
+                ObjectInputStream ois = new ObjectInputStream(fin);
+                oxModel = (SiOxidationModel)ois.readObject();
+                ois.close();
+                OxidationCalculator.session.oxidationModels.add(oxModel);
+            }
+            catch (Exception e)
+            {
+                JOptionPane.showMessageDialog(null, "Can't open oxidation model file.", "Error", JOptionPane.ERROR_MESSAGE);
+            }            
+        }
+        
         jTableOxidationModels.updateUI();
     }//GEN-LAST:event_jButtonAddModelActionPerformed
+
+    private void jMenuItemModelEditorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemModelEditorActionPerformed
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new oxidationModelEditor().setVisible(true);
+            }
+        });
+    }//GEN-LAST:event_jMenuItemModelEditorActionPerformed
+
+    private void jMenuItemSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSaveActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItemSaveActionPerformed
+
+    private void jMenuItemOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemOpenActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItemOpenActionPerformed
     
     private void waferSelected(boolean selected)
     {
         jCalculateButton.setEnabled(selected);
         jAddButton.setEnabled(selected);
         jRemoveButton.setEnabled(selected);
-        jMenuItemSave.setEnabled(selected);
-        jMenuItemSaveAs.setEnabled(selected);
+        //jMenuItemSave.setEnabled(selected);
+        //jMenuItemSaveAs.setEnabled(selected);
+        jButtonAddModel.setEnabled(selected);
+        jButtonRemoveModel.setEnabled(selected);
         jTableOxidationModels.updateUI();
     }
     
