@@ -395,6 +395,8 @@ public class oxidationModelEditor extends javax.swing.JFrame {
         oxModel.setEaBA(Double.parseDouble(jTextField_EaBA.getText()));
         oxModel.setEaB(Double.parseDouble(jTextField_EaB.getText()));
         oxModel.setDefault_Xi(Double.parseDouble(jTextField_Xi.getText()));
+        oxModel.BA.setParameters(oxModel.getD0BA(), oxModel.getEaBA());
+        oxModel.B.setParameters(oxModel.getD0B(), oxModel.getEaB());
     }
     
     /**

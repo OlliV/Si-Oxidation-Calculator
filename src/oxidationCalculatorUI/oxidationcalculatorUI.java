@@ -34,18 +34,14 @@ import oxidationModel.SiOxidationModel;
  * @author ollivanhoja
  */
 public class oxidationcalculatorUI extends javax.swing.JFrame {
-
-    JFileChooser fcWaferFile;
-    File waferFile;
+    SiWafer wafer;
     
     /**
      * Creates new form oxidationcalculatorUI
      */
     public oxidationcalculatorUI() {
         initComponents();        
-        fcWaferFile = new JFileChooser();
-        fcWaferFile.addChoosableFileFilter(new SimpleFileFilter("wafer", "Si wafer file"));
-        
+
         // Wafer not selected so disable some buttons
         waferSelected(false);
     }
@@ -399,6 +395,8 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
             null,
             possibilities,
             "Xo");
+        if (s == null)
+            return;
         String strModel = (String)JOptionPane.showInputDialog(
             this,
             "Use oxidation model:\n",
@@ -407,6 +405,8 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
             null,
             OxidationCalculator.session.oxidationModels.getNames(),
             "Xo");
+        if (strModel == null)
+            return;
 
             SiOxidationModel model;
             try
@@ -447,6 +447,12 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jRemoveButtonActionPerformed
 
     private void jSelectWaferButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jSelectWaferButtonActionPerformed
+        JFileChooser fcWaferFile;
+        File waferFile;
+        
+        fcWaferFile = new JFileChooser();
+        fcWaferFile.addChoosableFileFilter(new SimpleFileFilter("wafer", "Si wafer file"));
+    
         if (fcWaferFile.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
         {
             try
@@ -454,12 +460,15 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
                 waferFile = fcWaferFile.getSelectedFile();
                 FileInputStream fin = new FileInputStream(waferFile.getAbsolutePath());
                 ObjectInputStream ois = new ObjectInputStream(fin);
-                OxidationCalculator.session.setWafer((SiWafer)ois.readObject());
+                wafer = (SiWafer)ois.readObject();
+                OxidationCalculator.session.setWafer(wafer);
                 ois.close();
             }
             catch (Exception e)
             {
+                // TODO More error messages
                 JOptionPane.showMessageDialog(null, "Can't open wafer file.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
             }
 
             // Update fields
@@ -518,6 +527,7 @@ public class oxidationcalculatorUI extends javax.swing.JFrame {
                 ObjectInputStream ois = new ObjectInputStream(fin);
                 oxModel = (SiOxidationModel)ois.readObject();
                 ois.close();
+                oxModel.setWafer(wafer);
                 OxidationCalculator.session.oxidationModels.add(oxModel);
             }
             catch (Exception e)

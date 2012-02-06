@@ -194,6 +194,12 @@ public class SiOxidationModel implements IOxidationModel
         this.name = name;
     }
     
+    public SiOxidationModel()
+    {
+        BA = new SiOxidationModel.ArrheniusRl(0, 0);
+        B = new SiOxidationModel.ArrheniusRl(0, 0);
+    }
+    
     /**
      * Linear rate constant
      */
@@ -206,7 +212,7 @@ public class SiOxidationModel implements IOxidationModel
     /**
      * Arrhenius relationship
      */
-    public class ArrheniusRl
+    public class ArrheniusRl implements Serializable
     {
         double D0;
         double Ea;
@@ -215,6 +221,12 @@ public class SiOxidationModel implements IOxidationModel
          */
         final double kB = 0.000086173324;
 
+        public void setParameters(double D0, double Ea)
+        {
+            this.D0 = D0;
+            this.Ea = Ea;
+        }
+        
         public ArrheniusRl(double D0, double Ea)
         {
             this.D0 = D0;
